@@ -1,3 +1,7 @@
+--
+-- Данное разбиение имеет смысл если фалы хранятся непосредственно в самой таблице
+--
+
 -- Таблица тип записи медиаконтента 
 CREATE TABLE media_content_types (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT "Идентификатор строки",
@@ -18,15 +22,20 @@ CREATE TABLE media (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT "Медиа";
 
 -- Таблица медиафайлов загруженных пользователем
+--
+-- Данное разбиение имеет смысл если фалы хранятся непосредственно в самой таблице
+--
 CREATE TABLE media_files (
   media_id INT UNSIGNED NOT NULL COMMENT "Ссылка media-запись созданную пользователем",
   filename VARCHAR(255) NOT NULL COMMENT "Путь к файлу",
   -- extantion VARCHAR(4) NOT NULL COMMENT "Расширение файла",
   size INT NOT NULL COMMENT "Размер файла",
+  file_data BLOB NOT NULL COMMENT "Содержимое файла",
   metadata JSON COMMENT "Метаданные файла",
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT "Время создания строки",
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT "Время обновления строки"
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT "Медиафайлы";
+
 
 -- Таблица ссылок на медиаресурсы в web
 CREATE TABLE media_files (
