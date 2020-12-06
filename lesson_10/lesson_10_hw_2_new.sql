@@ -20,7 +20,17 @@ SELECT /*DISTINCT*/ cm_u.community_id, cm.name , cm_u.user_id, prf.birthday
 -- INSERT INTO vk.users (first_name, last_name, email, phone) VALUES('Иван', 'Иванов', 'ii@mail.ru', '8-(999)-78986563');
 -- INSERT INTO vk.profiles (user_id, gender, birthday, city, country, created_at, updated_at) VALUES(101, 'M', '1999-11-13', 'Moscow', 'Russia', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 -- INSERT INTO vk.communities (name, created_at, updated_at) VALUES('Машинное обучение, AI, нейронные сети, Big Data', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
--- 	 		 
+-- 	 	
+
+SELECT   name
+	   , AVG(group_total) OVER() AS average -- среднее количество пользователей в группах;
+ 	   , first -- самый молодой пользователь в группе;
+ 	   , last -- самый старший пользователь в группе;
+ 	   , total -- всего пользователей в системе;
+ 	   , group_total -- всего пользователей в группе;
+ 	   , `%%` 	  -- - отношение в процентах (общее количество пользователей в группе / всего пользователей в системе) * 100.
+FROM 
+(	 		 
 SELECT DISTINCT id, name
  	  , FIRST_VALUE(birthday) OVER w AS 'first' -- самый молодой пользователь в группе;
  	  , LAST_VALUE(birthday) OVER w1 AS 'last' -- самый старший пользователь в группе;
@@ -42,8 +52,8 @@ SELECT DISTINCT id, name
 		) tbl
 		WINDOW w  AS (PARTITION BY tbl.id ORDER BY tbl.id),
 	 		 w1 AS (PARTITION BY tbl.id RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
-ORDER BY id DESC; -- , birthday, user_id DESC;
-
+-- ORDER BY id DESC; -- , birthday, user_id DESC;
+) tbl_1;
 -- Результат
 -- ---------------------------------------------------------------------------------------- --
 -- 9	Машинное обучение, AI, нейронные сети, Big Data			101	0	0.0000 -- Группа не содержащая ни одного пользователя
