@@ -55,6 +55,8 @@ CREATE TRIGGER check_available_insert BEFORE INSERT ON products
 FOR EACH ROW
 BEGIN 
 	-- Количество доступных товаров (products.available) нового товара по умолчанию.
+	-- Cоздан на случай, если будет попытка добавления в таблицу products нового товара,
+ 	-- с количеством товара available отличным от нуля.
 	SET NEW.available = 0;
 END//
 
@@ -184,8 +186,9 @@ SELECT "products" AS `table`, '' AS shop_id, id AS product_id, available AS prod
 -- ----------------------------------------------------------------------------------------------
 DROP TRIGGER IF EXISTS check_users_products__products_count_insert;
 DELIMITER //
-
+-- 22. В триггере check_users_products__products_count_insert вероятно нужно также проверять чтобы не было задано больше товара, чем есть остатке.
 -- 1 --
+
 CREATE TRIGGER check_users_products__products_count_insert BEFORE INSERT ON users_products
 FOR EACH ROW
 -- При добавлении новой записи в таблицу users_products, должно проверяется доступное количество товара.
@@ -198,7 +201,12 @@ BEGIN
   	 	-- Ошибка. Товар отсутствует.
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ITEM IS NOT EVALABLE';
 	ELSE
-		SET NEW.product_count = num;
+	  	IF num > product_count(NEW.product_id) THEN 
+	  	 	-- Ошибка. Товар отсутствует.
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ITEM QUANTITY NOT ENOUGH FOR ORDER';
+		ELSE
+			SET NEW.product_count = num;
+		END IF;
 	END IF;
 END//
 

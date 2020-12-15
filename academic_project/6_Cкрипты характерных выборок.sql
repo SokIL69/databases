@@ -41,12 +41,12 @@ SELECT pr.id,
 	   product_type,
 	   pr.name AS product,
 	   price, -- pr.format, pr.weight, 
-	   IF(available > 0, 'доступно', 'нет в наличии') AS available,
+	   IF(available, 'доступно', 'нет в наличии') AS available,
 	   -- pr.description, anotation,
 	   product_count AS count,
 	   sh.name AS Shop
   FROM products pr
- 	   JOIN product_types pt ON pt.id = pr.product_types_id
+ 	   JOIN product_types pt ON pt.id = pr.product_type_id
 	   LEFT OUTER JOIN products_shops ps ON pr.id = ps.product_id 
 	   LEFT OUTER JOIN shops sh ON sh.id = ps.shop_id
  WHERE pt.product_type LIKE 'Настольные и семейные игры'
@@ -62,7 +62,7 @@ SELECT sh.name AS Shop, /*pr.id,*/
 	   price, /*pr.format, pr.weight, available, pr.description, anotation,*/
 	   product_count AS count
   FROM products pr
-	   JOIN product_types pt ON pt.id = pr.product_types_id
+	   JOIN product_types pt ON pt.id = pr.product_type_id
 	   LEFT OUTER JOIN products_shops ps ON pr.id = ps.product_id 
 	   LEFT OUTER JOIN shops sh ON sh.id = ps.shop_id
   WHERE sh.name  LIKE 'м. ВДНХ'
@@ -73,19 +73,19 @@ SELECT sh.name AS Shop, /*pr.id,*/
 -- 3. Подробная информация о товаре;
 -- 
 SELECT  pr.id,
-		-- pr.product_types_id,
+		-- pr.product_type_id,
 		product_type, 
 		pr.name AS product,
 		price,
 		pr.format,
 		pr.weight, 
-		IF(available > 0, 'доступно', 'нет в наличии') AS available,
+		IF(available, 'доступно', 'нет в наличии') AS available,
 		pr.description, 
 		anotation, 
 		product_count AS count, 
 		sh.name AS Shop -- , ps.product_id, ps.shop_id
   FROM products pr
-  	JOIN product_types pt ON pt.id = pr.product_types_id
+  	JOIN product_types pt ON pt.id = pr.product_type_id
   	LEFT OUTER JOIN products_shops ps ON pr.id = ps.product_id 
   	LEFT OUTER JOIN shops sh ON sh.id = ps.shop_id
   WHERE pr.name LIKE 'Настольная игра "Азбука Мурррзе": на 2-6 игроков'
@@ -185,7 +185,7 @@ SELECT sr.id,
 	   bk.`year` 
 FROM series sr
 	 JOIN publishing_houses ph ON ph.id = sr.publishing_house_id
-	 JOIN books bk ON bk.series_id = sr.id
+	 LEFT OUTER JOIN books bk ON bk.series_id = sr.id
 -- WHERE ph.name LIKE '%nemo%'
 -- WHERE sr.name LIKE 'Enim tempora illum iure.'
 ORDER BY publishing_house, serias;
@@ -307,10 +307,10 @@ SELECT pr.id,
 	   product_type,
 	   pr.name AS product,
 	   price, -- pr.format, pr.weight, 
-	   IF(available > 0, 'доступно', 'нет в наличии') AS available,
+	   IF(available, 'доступно', 'нет в наличии') AS available,
 	   prsh.product_count
   FROM products pr
-  	JOIN product_types pt ON pt.id = pr.product_types_id
+  	JOIN product_types pt ON pt.id = pr.product_type_id
 	LEFT OUTER JOIN (
 		 	SELECT SUM(product_count) AS product_count, product_id
 			  FROM products_shops
